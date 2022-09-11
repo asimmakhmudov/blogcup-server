@@ -14,7 +14,6 @@
 # misc
 .env
 .env.test
-key.env
 
 npm-debug.log*
 yarn-debug.log*
