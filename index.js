@@ -49,10 +49,10 @@ var corsOptions = {
     allowedHeaders: 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept',
 }
 
-app.use("/api/auth", authRoute);
-app.use("/api/users", usersRoute);
-app.use("/api/posts", postsRoute);
-app.use("/api/categories", categoriesRoute);
+app.use("/api/auth", authRoute, cors(corsOptions));
+app.use("/api/users", usersRoute, cors(corsOptions));
+app.use("/api/posts", postsRoute, cors(corsOptions));
+app.use("/api/categories", categoriesRoute, cors(corsOptions));
 app.use(cors(corsOptions));
 
 app.use((req, res, next) => {
