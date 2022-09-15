@@ -14,22 +14,22 @@ dotenv.config();
 app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, '/images')));
 
-mongoose.connect(process.env.MONGO_URL, { 
-    useNewUrlParser: true, 
+mongoose.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
     useUnifiedTopology: true,
     // useFindAndModify: true,
     // useCreateIndex: true,
 })
-.then(
-    () => console.log('MongoDB Connected')
-)
-.catch(
-    err => console.log(err)
-);
+    .then(
+        () => console.log('MongoDB Connected')
+    )
+    .catch(
+        err => console.log(err)
+    );
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'images');   
+        cb(null, 'images');
     }, filename: (req, file, cb) => {
         cb(null, req.body.name)
     }
@@ -37,12 +37,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post("/api/upload", upload.single("file"),(req,res)=> {
+app.post("/api/upload", upload.single("file"), (req, res) => {
     res.status(200).json("File has been uploaded");
 })
 
 var corsOptions = {
-    origin: 'https://limonblog.netlify.app' ,
+    origin: 'https://limonblog.netlify.app',
     optionsSuccessStatus: 200,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -55,6 +55,13 @@ app.use("/api/posts", postsRoute);
 app.use("/api/categories", categoriesRoute);
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type, Accept, content - type, application / json');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header("Access-Control-Allow-Credentials", true);
+    next();
+});
 
 app.listen(process.env.PORT || 8000, () => {
     console.log("Backend is running on port " + process.env.PORT || "8000");
