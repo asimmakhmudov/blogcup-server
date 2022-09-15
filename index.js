@@ -7,7 +7,8 @@ const usersRoute = require('./routes/users');
 const postsRoute = require('./routes/posts');
 const categoriesRoute = require('./routes/categories');
 const multer = require('multer');
-const path = require('path')
+const path = require('path');
+const cors = require('cors');
 
 dotenv.config();
 app.use(express.json());
@@ -40,10 +41,19 @@ app.post("/api/upload", upload.single("file"),(req,res)=> {
     res.status(200).json("File has been uploaded");
 })
 
+var corsOptions = {
+    origin: 'https://limonblog.netlify.app' ,
+    optionsSuccessStatus: 200,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept',
+}
+
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/posts", postsRoute);
 app.use("/api/categories", categoriesRoute);
+app.use(cors(corsOptions));
 
 
 app.listen(process.env.PORT || 8000, () => {
