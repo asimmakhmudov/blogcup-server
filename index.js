@@ -41,22 +41,29 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
     res.status(200).json("File has been uploaded");
 })
 
-var corsOptions = {
-    origin: 'https://limonblog.netlify.app',
-    optionsSuccessStatus: 200,
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept',
-}
+// NOT WORKING
+// var corsOptions = {
+//     origin: 'https://limonblog.netlify.app',
+//     optionsSuccessStatus: 200,
+//     credentials: true,
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     allowedHeaders: 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept',
+// }
 
 app.use("/api/auth", authRoute, cors(corsOptions));
 app.use("/api/users", usersRoute, cors(corsOptions));
 app.use("/api/posts", postsRoute, cors(corsOptions));
 app.use("/api/categories", categoriesRoute, cors(corsOptions));
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
+// updated
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://limonblog.netlify.app/");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
 
