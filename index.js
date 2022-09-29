@@ -9,6 +9,7 @@ const categoriesRoute = require('./routes/categories');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
+const { cloudinary } = require('./utils/cloudinary');
 
 dotenv.config();
 app.use(express.json());
@@ -28,18 +29,44 @@ mongoose.connect(process.env.MONGO_URL, {
 
 
 // for image upload
-app.use('/images', express.static(path.join(__dirname, '/images')));
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'images');
-    }, filename: (req, file, cb) => {
-        cb(null, req.body.name)
+// app.use('/images', express.static(path.join(__dirname, '/images')));
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, 'images');
+//     }, filename: (req, file, cb) => {
+//         cb(null, req.body.name)
+//     }
+// });
+// const upload = multer({ storage: storage });
+// app.post("/api/upload", upload.single("file"), (req, res) => {
+//     res.status(200).json("File has been uploaded");
+// })
+
+
+app.get('/images', async (req, res) => {
+    const { resources } = await cloudinary.search
+        .expression('folder:dev_setups')
+        .sort_by('public_id', 'desc')
+        .max_results(30)
+        .execute();
+
+    const publicIds = resources.map((file) => file.public_id);
+    res.send(publicIds);
+});
+app.post('/api/upload', async (req, res) => {
+    try {
+        const fileStr = req.body.data;
+        const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+            upload_preset: 'dev_setups',
+        });
+        console.log(uploadResponse);
+        res.json({ msg: 'yaya' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ err: 'Something went wrong' });
     }
 });
-const upload = multer({ storage: storage });
-app.post("/api/upload", upload.single("file"), (req, res) => {
-    res.status(200).json("File has been uploaded");
-})
+
 
 // updated, before routes
 app.use((req, res, next) => {
@@ -57,17 +84,6 @@ app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/posts", postsRoute);
 app.use("/api/categories", categoriesRoute);
-
-
-// NOT WORKING
-// var corsOptions = {
-//     origin: 'https://limonblog.netlify.app',
-//     optionsSuccessStatus: 200,
-//     credentials: true,
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     allowedHeaders: 'Content-Type, Authorization, Content-Length, X-Requested-With, Accept',
-// }
-// app.use(cors(corsOptions));
 
 
 app.listen(process.env.PORT || 8000, () => {
