@@ -27,7 +27,6 @@ mongoose.connect(process.env.MONGO_URL, {
     err => console.log(err)
 );
 
-
 // for image upload
 // app.use('/images', express.static(path.join(__dirname, '/images')));
 // const storage = multer.diskStorage({
@@ -41,6 +40,17 @@ mongoose.connect(process.env.MONGO_URL, {
 // app.post("/api/upload", upload.single("file"), (req, res) => {
 //     res.status(200).json("File has been uploaded");
 // })
+
+// updated, before routes
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
 
 
 app.get('/images', async (req, res) => {
@@ -65,18 +75,6 @@ app.post('/api/upload', async (req, res) => {
         console.error(err);
         res.status(500).json({ err: 'Something went wrong' });
     }
-});
-
-
-// updated, before routes
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        'Access-Control-Allow-Methods',
-        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
-    );
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
 });
 
 // routes
