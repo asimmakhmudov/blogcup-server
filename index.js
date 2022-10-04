@@ -9,7 +9,8 @@ const categoriesRoute = require('./routes/categories');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // cors middleware
 app.use((req, res, next) => {
