@@ -52,7 +52,6 @@ const storage = new CloudinaryStorage({
       folder: "DEV",
     },
 });
-
 const upload = multer({ storage: storage });
 
 
@@ -66,7 +65,6 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({ storage: storage });*/
-
 
 // img upload request
 app.post("/api/upload", upload.single("file"), async (req, res) => {
