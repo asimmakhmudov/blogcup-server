@@ -27,12 +27,22 @@ dotenv.config();
 app.use(express.json());
 app.use(cors());
 
-// Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+//Cloudinary
+module.exports = ({ env }) => ({
+    upload: {
+      provider: "cloudinary",
+      providerOptions: {
+        cloud_name: env("CLOUDINARY_NAME"),
+        api_key: env("CLOUDINARY_KEY"),
+        api_secret: env("CLOUDINARY_SECRET"),
+      },
+    },
 });
+// cloudinary.config({
+//     cloud_name: process.env.CLOUDINARY_NAME,
+//     api_key: process.env.CLOUDINARY_API_KEY,
+//     api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -42,7 +52,7 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage: storage });
 // img upload request
-app.post("/api/upload", upload.single("file"), async (req, res) => {
+app.post("/api/upload", upload.single("file"), (req, res) => {
     res.status(200).json("File has been uploaded");
 })
 
