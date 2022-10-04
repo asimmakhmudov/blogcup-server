@@ -27,6 +27,25 @@ dotenv.config();
 app.use(express.json());
 app.use(cors());
 
+// Cloudinary
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: "DEV",
+    },
+});
+const upload = multer({ storage: storage });
+// img upload request
+app.post("/api/upload", upload.single("file"), async (req, res) => {
+    res.status(200).json("File has been uploaded");
+})
+
 // Connect to DB
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -40,22 +59,6 @@ mongoose.connect(process.env.MONGO_URL, {
 );
 
 
-// Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: "DEV",
-    },
-});
-const upload = multer({ storage: storage });
-
-
 /*for local storage
 app.use('/images', express.static(path.join(__dirname, '/images')));
 const storage = multer.diskStorage({
@@ -67,10 +70,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });*/
 
-// img upload request
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-    res.status(200).json("File has been uploaded");
-})
+
 // routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
