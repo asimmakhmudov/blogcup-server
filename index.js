@@ -11,6 +11,17 @@ const path = require('path');
 const cors = require('cors');
 const cloudinary = require("cloudinary").v2;
 
+// cors middleware
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 dotenv.config();
 app.use(express.json());
 app.use(cors());
@@ -45,34 +56,22 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage: storage });
 
 
-// for local storage
-// app.use('/images', express.static(path.join(__dirname, '/images')));
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         cb(null, 'images');
-//     }, filename: (req, file, cb) => {
-//         cb(null, req.body.name)
-//     }
-// });
-// const upload = multer({ storage: storage });
-
-
-// cors middleware
-app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-        'Access-Control-Allow-Methods',
-        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
-    );
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
+/*for local storage
+app.use('/images', express.static(path.join(__dirname, '/images')));
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    }, filename: (req, file, cb) => {
+        cb(null, req.body.name)
+    }
 });
+const upload = multer({ storage: storage });*/
+
 
 // img upload request
 app.post("/api/upload", upload.single("file"), async (req, res) => {
     res.status(200).json("File has been uploaded");
 })
-
 // routes
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
