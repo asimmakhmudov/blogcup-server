@@ -52,9 +52,11 @@ app.post("/api/upload", upload.single("file"), async(req, res) => {
     res.status(200).json("File has been uploaded");
 })
 
+app.use(express.static(path.join(__dirname, "/client/build")));
 
-
-
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/client/build', 'index.html'));
+});
 
 // routes
 app.use("/api/auth", authRoute);
