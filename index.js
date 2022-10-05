@@ -6,11 +6,13 @@ const authRoute = require('./routes/auth');
 const usersRoute = require('./routes/users');
 const postsRoute = require('./routes/posts');
 const categoriesRoute = require('./routes/categories');
-const multer = require('multer');
-const path = require('path');
 const cors = require('cors');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+// const { CloudinaryStorage } = require('multer-storage-cloudinary');
+// const multer = require('multer');
+// const path = require('path');
+dotenv.config();
+app.use(express.json());
 
 // cors middleware
 app.use((req, res, next) => {
@@ -22,10 +24,18 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     next();
 });
-
-dotenv.config();
-app.use(express.json());
 app.use(cors());
+
+
+
+
+
+
+
+
+
+
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -33,18 +43,69 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: "DEV",
-    },
+app.get('/api/images', async (req, res) => {
+    const { resources } = await cloudinary.search
+        .expression('folder:dev_setups')
+        .sort_by('public_id', 'desc')
+        .max_results(30)
+        .execute();
+
+    const publicIds = resources.map((file) => file.public_id);
+    res.send(publicIds);
 });
 
-const upload = multer({ storage: storage });
+app.post('/api/upload', async (req, res) => {
+    try {
+        const fileStr = req.body.data;
+        const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+            upload_preset: 'dev_setups',
+        });
+        console.log(uploadResponse);
+        res.json({ msg: 'uploaded!' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ err: 'Something went wrong!' });
+    }
+});
 
-app.post("/api/upload", upload.single("picture"), async (req, res) => {
-    return res.status(200).json({ picture: req.file.path });
-})
+
+
+
+
+
+
+
+
+
+// const storage = new CloudinaryStorage({
+//     cloudinary: cloudinary,
+//     params: {
+//       folder: "DEV",
+//     },
+// });
+// const upload = multer({ storage: storage });
+// app.post("/api/upload", upload.single("picture"), async (req, res) => {
+//     return res.status(200).json({ picture: req.file.path });
+// })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Connect to DB
 mongoose.connect(process.env.MONGO_URL, {
