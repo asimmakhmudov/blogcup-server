@@ -7,10 +7,10 @@ const usersRoute = require('./routes/users');
 const postsRoute = require('./routes/posts');
 const categoriesRoute = require('./routes/categories');
 const cors = require('cors');
-const cloudinary = require('cloudinary').v2;
+// const cloudinary = require('cloudinary').v2;
 // const { CloudinaryStorage } = require('multer-storage-cloudinary');
-// const multer = require('multer');
-// const path = require('path');
+const multer = require('multer');
+const path = require('path');
 dotenv.config();
 app.use(express.json());
 
@@ -27,53 +27,36 @@ app.use((req, res, next) => {
 app.use(cors());
 
 
+// cloudinary.config({
+//     cloud_name: process.env.CLOUDINARY_NAME,
+//     api_key: process.env.CLOUDINARY_API_KEY,
+//     api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
 
+// app.get('/api/images', async (req, res) => {
+//     const { resources } = await cloudinary.search
+//         .expression('folder:dev_setups')
+//         .sort_by('public_id', 'desc')
+//         .max_results(30)
+//         .execute();
 
+//     const publicIds = resources.map((file) => file.public_id);
+//     res.send(publicIds);
+// });
 
-
-
-
-
-
-
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-app.get('/api/images', async (req, res) => {
-    const { resources } = await cloudinary.search
-        .expression('folder:dev_setups')
-        .sort_by('public_id', 'desc')
-        .max_results(30)
-        .execute();
-
-    const publicIds = resources.map((file) => file.public_id);
-    res.send(publicIds);
-});
-
-app.post('/api/upload', async (req, res) => {
-    try {
-        const fileStr = req.body.data;
-        const uploadResponse = await cloudinary.uploader.upload(fileStr, {
-            upload_preset: 'dev_setups',
-        });
-        console.log(uploadResponse);
-        res.json({ msg: 'uploaded!' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ err: 'Something went wrong!' });
-    }
-});
-
-
-
-
-
-
-
+// app.post('/api/upload', async (req, res) => {
+//     try {
+//         const fileStr = req.body.data;
+//         const uploadResponse = await cloudinary.uploader.upload(fileStr, {
+//             upload_preset: 'dev_setups',
+//         });
+//         console.log(uploadResponse);
+//         res.json({ msg: 'uploaded!' });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ err: 'Something went wrong!' });
+//     }
+// });
 
 
 
@@ -90,23 +73,6 @@ app.post('/api/upload', async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Connect to DB
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -120,7 +86,7 @@ mongoose.connect(process.env.MONGO_URL, {
 );
 
 
-/*for local storage
+// for local storage
 app.use('/images', express.static(path.join(__dirname, '/images')));
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -129,8 +95,10 @@ const storage = multer.diskStorage({
         cb(null, req.body.name)
     }
 });
-const upload = multer({ storage: storage });*/
-
+const upload = multer({ storage: storage });
+app.post("/api/upload", upload.single("file"), async(req, res) => {
+    res.status(200).json("File has been uploaded");
+})
 
 // routes
 app.use("/api/auth", authRoute);
